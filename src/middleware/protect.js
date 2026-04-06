@@ -8,8 +8,10 @@ exports.protect = async (req, res, next) => {
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies && req.cookies.jwt) {
-      token = req.cookies.jwt;
+    } else if (req.cookies) {
+      token = req.cookies.jwt || 
+              req.cookies['next-auth.session-token'] || 
+              req.cookies['__Secure-next-auth.session-token'];
     }
 
     if (!token) {
@@ -19,21 +21,21 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    if (token.includes('@')) {
-      const userByEmail = await User.findOne({ email: token });
-      if (!userByEmail) {
-        return res.status(401).json({
-          status: 'fail',
-          message: 'Authentication failed.'
-        });
-      }
-      req.user = userByEmail;
-      return next();
+    let currentUser;
+    let decoded;
+
+    try {
+      decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+      currentUser = await User.findById(decoded.id);
+    } catch (err) {
+      currentUser = await User.findOne({
+        $or: [
+          { externalProviderId: token },
+          { email: token } 
+        ]
+      });
     }
 
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-    const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
       return res.status(401).json({
         status: 'fail',
@@ -43,7 +45,9 @@ exports.protect = async (req, res, next) => {
 
     if (currentUser.passwordChangedAt) {
       const changedTimestamp = parseInt(currentUser.passwordChangedAt.getTime() / 1000, 10);
-      if (decoded.iat < changedTimestamp) {
+      const tokenData = decoded || jwt.decode(token);
+      
+      if (tokenData && tokenData.iat < changedTimestamp) {
         return res.status(401).json({
           status: 'fail',
           message: 'Security Protocol: Password recently changed. Please re-establish link.'

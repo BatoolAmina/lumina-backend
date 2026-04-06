@@ -2,10 +2,11 @@ const rateLimit = require('express-rate-limit');
 const { SECURITY } = require('../config/constants');
 
 const apiLimiter = rateLimit({
-  windowMs: SECURITY.RATE_LIMIT_WINDOW || 15 * 60 * 1000,
-  max: SECURITY.RATE_LIMIT_MAX_REQUESTS || 100,
+  windowMs: SECURITY?.RATE_LIMIT_WINDOW || 15 * 60 * 1000,
+  max: SECURITY?.RATE_LIMIT_MAX_REQUESTS || 100,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
   handler: (req, res) => {
     res.status(429).json({
       status: 'fail',
@@ -16,7 +17,7 @@ const apiLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 10,
+  max: 15,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
@@ -29,7 +30,7 @@ const authLimiter = rateLimit({
 
 const aiGenerationLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 15,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {

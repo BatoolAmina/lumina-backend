@@ -4,15 +4,14 @@ const ROLES = {
   GUEST: 'guest'
 };
 
-CHAT_MODELS = {
+const CHAT_MODELS = {
   CONTENT: 'deepseek-ai/DeepSeek-V3',
-  CODE: 'Qwen/Qwen2.5-Coder-32B-Instruct',  
-  IMAGE_ANALYZER: 'Qwen/Qwen2.5-VL-7B-Instruct:hyperbolic', 
+  CODE: 'Qwen/Qwen2.5-Coder-32B-Instruct',
+  IMAGE_ANALYZER: 'Qwen/Qwen2.5-VL-7B-Instruct:hyperbolic',
   IMAGE: 'black-forest-labs/FLUX.1-schnell',
   EMBEDDING: 'sentence-transformers/all-MiniLM-L6-v2'
 };
 
-module.exports = { CHAT_MODELS };
 const RAG_CONFIG = {
   CHUNK_SIZE: 1000,
   CHUNK_OVERLAP: 200,
@@ -26,7 +25,7 @@ const SECURITY = {
   COOKIE_EXPIRE: 7,
   RATE_LIMIT_WINDOW: 15 * 60 * 1000,
   RATE_LIMIT_MAX_REQUESTS: 100,
-  AI_LIMIT_MAX_REQUESTS: 15
+  AI_LIMIT_MAX_REQUESTS: 20
 };
 
 const ROOM_EVENTS = {

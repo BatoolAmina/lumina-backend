@@ -2,8 +2,6 @@ const { HfInference } = require('@huggingface/inference');
 const { OpenAI } = require('openai');
 const { CHAT_MODELS } = require('../config/constants');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 const hf = new HfInference(process.env.HUGGINGFACE_TOKEN);
 
 const client = new OpenAI({
